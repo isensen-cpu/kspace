@@ -416,11 +416,8 @@ a{text-decoration:none;color:inherit}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1F3CC9&quot;,&quot;options&quot;:[&quot;#1F3CC9&quot;,&quot;#16258A&quot;,&quot;#2438C8&quot;,&quot;#0057FF&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;reduceMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
 class Component extends DCLogic {
-  // ▼▼▼ 예약 알림 설정 — 따옴표 안만 본인 키로 교체하세요 ▼▼▼
-  // web3forms.com 에서 isensen@nonosd.com 으로 무료 발급받은 Access Key
-  WEB3FORMS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
+  // 예약 알림 수신 이메일 (FormSubmit.co 사용 — 별도 계정·키 불필요)
   NOTIFY_EMAIL = 'isensen@nonosd.com';
-  // ▲▲▲ 키 교체 후 저장하면 예약이 이 이메일로 자동 발송됩니다 ▲▲▲
 
   state = {
     purpose: '', name: '', phone: '', email: '', date: '', notes: '',
@@ -459,29 +456,24 @@ class Component extends DCLogic {
       localStorage.setItem('kspace_bookings', JSON.stringify(all));
     } catch (err) {}
 
-    const keyOk = this.WEB3FORMS_KEY && this.WEB3FORMS_KEY.indexOf('YOUR_') !== 0;
-    if (keyOk) {
-      try {
-        await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            access_key: this.WEB3FORMS_KEY,
-            subject: '[K-SPACE 예약] ' + name + ' · ' + (opt ? opt.label : purpose) + ' (' + ref + ')',
-            from_name: 'K-SPACE 홈페이지',
-            replyto: email,
-            botcheck: '',
-            '예약번호': ref,
-            '목적': purposeLabel,
-            '이름': name,
-            '연락처': phone,
-            '이메일': email,
-            '희망일': dateLabel,
-            '요청사항': notes || '-'
-          })
-        });
-      } catch (err) {}
-    }
+    try {
+      await fetch('https://formsubmit.co/ajax/' + this.NOTIFY_EMAIL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: '[K-SPACE 예약] ' + name + ' · ' + (opt ? opt.label : purpose) + ' (' + ref + ')',
+          _template: 'table',
+          _captcha: 'false',
+          '예약번호': ref,
+          '목적': purposeLabel,
+          '이름': name,
+          '연락처': phone,
+          '이메일': email,
+          '희망일': dateLabel,
+          '요청사항': notes || '-'
+        })
+      });
+    } catch (err) {}
 
     this.setState({ confirmed: true, ref, sending: false });
   };
