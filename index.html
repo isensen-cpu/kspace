@@ -416,8 +416,8 @@ a{text-decoration:none;color:inherit}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#1F3CC9&quot;,&quot;options&quot;:[&quot;#1F3CC9&quot;,&quot;#16258A&quot;,&quot;#2438C8&quot;,&quot;#0057FF&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;reduceMotion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Theme&quot;}}">
 class Component extends DCLogic {
-  // 예약 알림 수신 이메일 (FormSubmit.co 사용 — 별도 계정·키 불필요)
-  NOTIFY_EMAIL = 'isensen@nonosd.com';
+  // 예약 알림: FormSubmit.co (활성화 완료). 가린 전용 엔드포인트로 등록된 메일에 전달됨.
+  FORM_ENDPOINT = 'de9d1e32ad87b77975e8f34e89bbf364';
 
   state = {
     purpose: '', name: '', phone: '', email: '', date: '', notes: '',
@@ -457,7 +457,7 @@ class Component extends DCLogic {
     } catch (err) {}
 
     try {
-      await fetch('https://formsubmit.co/ajax/' + this.NOTIFY_EMAIL, {
+      await fetch('https://formsubmit.co/ajax/' + this.FORM_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
